@@ -1,0 +1,74 @@
+LMPC_2011_Rules:
+  Rule_3_and_26_Exemptions:
+    exempt_if_qty_less_than_g: 10
+    exempt_if_qty_less_than_ml: 10
+    exempt_if_qty_greater_than_kg: 25
+    exempt_if_qty_greater_than_L: 25
+
+  Rule_6_and_10_Mandatory_Declarations:
+    always_required:
+      - PRODUCT_NAME
+      - NET_QUANTITY
+      - MRP
+      - PACK_DATE
+      - CONSUMER_CARE_PHONE
+      - CONSUMER_CARE_EMAIL
+      - CONSUMER_CARE_ADDRESS
+    
+    conditional:
+      - field: MANUFACTURER_NAME
+        condition: is_imported == False
+      - field: MANUFACTURER_ADDRESS
+        condition: is_imported == False
+      - field: COUNTRY_OF_ORIGIN
+        condition: is_imported == True
+      - field: IMPORTER_NAME
+        condition: is_imported == True
+      - field: IMPORTER_ADDRESS
+        condition: is_imported == True
+      - field: BEST_BEFORE_USE_BY
+        condition: product_category == 'Food'
+
+  Rule_14_and_16_Category_Specific:
+    conditional:
+      - required_fields: ["DIMENSIONS"]
+        condition: product_category == 'Textile'
+      - required_fields: ["DIMENSIONS"]
+        condition: product_category == 'Paper'
+
+  Rule_13_Unit_Formats:
+    allowed_metric_units:
+      - g
+      - kg
+      - ml
+      - l
+      - m
+      - cm
+      - mm
+      - u
+      - n
+      - pcs
+      - unit
+      - units
+      - piece
+      - pieces
+
+  Rule_12_Prohibited_Words:
+    forbidden_quantity_modifiers:
+      - "approximately"
+      - "about"
+      - "minimum"
+      - "not less than"
+
+  Rule_7_PDP_Area_Minimum_Heights:
+    ranges:
+      - condition: "< 50"
+        min_height_mm: 1.0
+      - condition: ">= 50 and <= 100"
+        min_height_mm: 1.5
+      - condition: "> 100 and <= 500"
+        min_height_mm: 2.5
+      - condition: "> 500 and <= 2500"
+        min_height_mm: 4.0
+      - condition: "> 2500"
+        min_height_mm: 6.0

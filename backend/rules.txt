@@ -1,0 +1,516 @@
+Rule 2: Definitions
+
+It defines concepts such as:
+
+Dealer
+Industrial consumer
+Institutional consumer
+Marketplace model
+Lot
+Manufacturer
+Maximum permissible error
+Net quantity
+Packer
+Principal display panel
+Retail dealer
+Retail package
+Combination package
+Group package
+Multi-piece package
+Retail sale price
+Standard package
+Wholesale dealer
+Wholesale package
+
+For example, "net quantity" excludes packaging/wrapper, while "retail sale price" is the maximum price at which the packaged commodity may be sold to the consumer, inclusive of taxes.
+
+What your system needs
+
+This should become the ontology/context layer of your rule engine.
+
+For example:
+
+Product
+ ├── category
+ ├── package_type
+ ├── retail/wholesale
+ ├── imported?
+ ├── manufacturer
+ ├── packer
+ ├── combination package?
+ ├── group package?
+ └── multi-piece package?
+
+Rule 3: Applicability of Chapter II
+
+Chapter II does not apply to:
+
+Packages containing more than 25 kg or 25 litre
+Cement, fertilizer and agricultural farm produce sold in bags above 50 kg
+Packages meant for industrial or institutional consumers.
+What your system should do
+
+Before checking declarations:
+
+Identify package
+       ↓
+Determine quantity/package type
+       ↓
+Check Rule 3
+       ↓
+Applicable?
+   ↙       ↘
+ YES       NO
+ ↓          ↓
+Continue   Exempt from Chapter II
+Example
+
+A 30 kg package:
+
+Chapter II → Not applicable
+
+But don't simply declare:
+
+"Product compliant."
+
+Instead:
+
+"Chapter II applicability: Excluded under Rule 3."
+
+Rule 4: Regulation for pre-packing and sale
+
+A commodity intended for sale/distribution/delivery must carry the declarations required under the rules.
+
+An interesting exception:
+
+Packages without MRP inside the manufacturer's premises aren't automatically a violation, provided packages leaving the premises carry the required MRP. Promotional groups also have declaration requirements.
+
+System implementation
+
+The inspection context matters:
+
+Manufacturer premises
+       ≠
+Retail shop
+       ≠
+Warehouse
+
+Your inspection form should therefore ask:
+
+"Inspection location/type?"
+
+Rule 5: Standard package sizes
+
+⚠️ Important: Rule 5 itself was omitted with effect from 1 April 2022 in the consolidated document.
+
+Historically, it dealt with specified standard pack sizes.
+
+What should we do?
+
+Do not implement old Rule 5 as an active compliance rule.
+
+But the rule repository should preserve:
+
+Rule 5
+status = OMITTED
+effective_from = 01-04-2022
+
+This is important because your system should understand historical regulations too.
+
+Rule 6: Declarations on EVERY package
+
+specifies the declarations that must appear on packages.
+
+The major fields include:
+
+6(1)(a): Manufacturer / packer / importer
+
+Depending on the package:
+
+Manufacturer name/address
+Packer name/address where different
+Importer name/address for imported packages
+
+There are special provisions for electronic products involving QR codes.
+
+The rule also contains important responsibility presumptions regarding names/addresses and brand owners.
+
+6(1)(aa): Country of origin
+
+Imported products must declare:
+
+Country of origin / manufacture / assembly.
+
+6(1)(b): Common/generic name
+
+The common/generic name of the commodity must be declared.
+
+For multiple products, the package must identify each product and its number/quantity. Electronic products have QR-related provisions.
+
+6(1)(c): Net quantity
+
+The package must declare net quantity in the appropriate standard unit, or number when sold by number.
+
+6(1)(d): Month and year
+
+Month and year of manufacture are required, subject to the exceptions and special provisions in the rule.
+
+6(1)(da): Best before / use by
+
+For commodities that may become unfit for human consumption after a period, best before/use by date must be declared unless another law provides for it.
+
+6(1)(e): MRP
+
+The retail sale price must be declared as the maximum retail price inclusive of all taxes, in Indian currency.
+
+6(1)(f): Dimensions
+
+Where relevant, package dimensions of the commodity must be declared, including dimensions of different pieces where necessary.
+
+Electronic products have QR-code provisions for size/dimension information.
+
+6(1)(g): Other prescribed information
+
+This brings in additional special declarations and exceptions, including:
+
+Certain exemptions for bidi/incense sticks
+Specific LPG provisions
+Packaging-material transition provisions
+MRP exceptions for bidi and certain LPG cylinders.
+Rule 6(2): Consumer complaints
+
+Every package must bear:
+
+Name
+Address
+Telephone number
+E-mail address, if available
+
+of the person/office that can be contacted for consumer complaints.
+
+Electronic products have specific QR provisions.
+
+🚨 This is what your AI pipeline should extract
+
+The JSON file classes should therefore expand to something like:
+
+PRODUCT_NAME
+MANUFACTURER_NAME
+MANUFACTURER_ADDRESS
+PACKER_NAME
+PACKER_ADDRESS
+IMPORTER_NAME
+IMPORTER_ADDRESS
+COUNTRY_OF_ORIGIN
+NET_QUANTITY
+UNIT
+PACK_DATE
+MRP
+BEST_BEFORE
+USE_BY
+CONSUMER_CARE_NAME
+CONSUMER_CARE_ADDRESS
+CONSUMER_CARE_PHONE
+CONSUMER_CARE_EMAIL
+DIMENSIONS
+UNIT_SALE_PRICE
+
+Rule 7: Principal Display Panel, size and letters
+
+This is another major rule for your computer vision system.
+
+It specifies:
+
+Principal display panel
+Minimum character/numeral height
+Width-to-height requirement
+Different requirements depending on package/panel characteristics.
+
+The consolidated 2017 amendment changed the table to use the area of the principal display panel for minimum character/numeral height.
+
+The table provides minimum sizes based on principal display panel area.
+
+For example, the table uses areas such as:
+
+<50 cm²
+50-100 cm²
+100-500 cm²
+500-2500 cm²
+>2500 cm²
+
+with corresponding minimum heights.
+
+There is also a separate table for quantities expressed by length, area or number.
+
+System requirement
+
+This requires:
+
+Package image
+ ↓
+Identify principal display panel
+ ↓
+Estimate/measure panel dimensions
+ ↓
+Determine panel area
+ ↓
+Detect declaration text
+ ↓
+Measure character height
+ ↓
+Convert pixels → mm
+ ↓
+Compare with Rule 7 threshold
+
+Rule 10: Manufacturer name and address
+
+Every package offered/sold must conspicuously display:
+
+Manufacturer
+Packer where applicable
+Importer for imported packages
+
+There are special provisions for very small packages and products manufactured outside India but packed in India.
+
+The name must be the actual corporate/business name.
+
+System checks
+Manufacturer detected?
+Address detected?
+Packer detected if applicable?
+Importer detected if applicable?
+Country/import status consistent?
+
+Rule 12: Manner of quantity declaration
+
+Quantity should be expressed using appropriate:
+
+Mass
+Length
+Area
+Volume
+Number
+
+depending on the commodity.
+
+There are exceptions in the Fourth Schedule. Additional dimensions/number may also be required where necessary. The declaration cannot use wording that creates an exaggerated, misleading or inadequate impression of quantity.
+
+System
+
+This should become a major validation module:
+
+Commodity type
+      ↓
+Expected quantity type
+      ↓
+Declared quantity type
+      ↓
+Compare
+
+And detect suspicious wording such as:
+
+"approximately"
+"about"
+"minimum"
+"not less than"
+
+where prohibited by the rule.
+
+This defines how units should be expressed.
+
+Examples:
+
+<1 kg → grams
+≥1 kg → kilograms
+<1 m → centimetres
+≥1 m → metres
+<1 L → millilitres
+≥1 L → litres
+
+It also prohibits non-SI systems for net quantity and controls number/unit/piece terminology.
+
+Where multiple identical packages are contained in one prepackage, the number and quantity of each package must also be indicated.
+
+System
+
+This is perfect for deterministic validation.
+
+Example:
+
+Net Qty = 500 ml
+       ↓
+Valid unit? YES
+
+Net Qty = 0.5 litre
+       ↓
+Potential unit-format issue
+
+The exact validation must follow the current rule, rather than simplistic unit conversion alone.
+
+Rule 14: Dimensions of certain commodities
+
+For commodities such as:
+
+Bedsheets
+Fabric
+Dhotis
+Sarees
+Napkins
+Pillow covers
+Towels
+Table cloths
+
+the package must declare number and finished dimensions.
+
+If pieces have different dimensions, dimensions and MRP of each piece may need to be declared, and dimensions/sale price marked on individual pieces.
+
+System
+
+Product classifier:
+
+Is textile/dimension-sensitive product?
+          ↓
+YES
+          ↓
+Check dimensions
+
+Rule 15: Dimensions and weight
+
+Where dimensions/weight have a relationship to price, the quantity declaration must include those relevant dimensions/weight or combination.
+
+System
+
+Category-specific rule.
+
+Rule 16: Number of usable sheets
+
+For:
+
+Aluminium foil
+Facial tissues
+Waxed paper
+Toilet paper
+Similar sheet products
+
+the package must state:
+
+Number of usable sheets
+Dimensions of each sheet.
+System
+
+NER should extract:
+
+SHEET_COUNT
+SHEET_LENGTH
+SHEET_WIDTH
+Automation
+
+🟢 Declaration detection.
+
+Rule 24: Wholesale package declarations
+
+Every wholesale package must have:
+
+Manufacturer/importer/packer information
+Identity of commodity
+Total number of retail packages OR net quantity in standard units
+
+unless equivalent information is required by another applicable law.
+
+System
+
+Add an inspection mode:
+
+Package type:
+○ Retail
+○ Wholesale
+
+Then change the required declaration set accordingly.
+
+PART D: EXPORT
+Rule 25: Export packages sold in India
+
+An export package cannot simply be sold in India.
+
+It must first be repacked/relabelled according to Chapter II requirements. Otherwise it can be seized.
+
+System
+
+For an imported/export package:
+
+Export package?
+       ↓
+Sold in India?
+       ↓
+Chapter II compliance check
+
+⭐ Rule 26: Exemptions
+
+This is critical for avoiding false positives.
+
+The rules contain exemptions for certain packages, including:
+
+26(a)
+
+Very small quantities:
+
+10 g / 10 ml or less under the specified condition.
+
+The tobacco-related exception also matters.
+
+26(b)
+
+Fast food items packed by restaurants/hotels and similar establishments.
+
+26(c)
+
+Specified pharmaceutical formulations covered by the Drugs (Price Control) Order, subject to the medical-device proviso.
+
+26(d)
+
+Agricultural farm produce provision was omitted in the 2017 amendment.
+
+26(e)
+
+Thread sold in coils to handloom weavers.
+
+26(f)
+
+Certain garments/hosiery sold loose or open where consumers can inspect them before buying.
+
+However, specified information still needs to be provided, including:
+
+Manufacturer/marketer/brand owner/importer
+Country of origin for imported products
+Consumer-care contact
+Size information
+MRP
+
+and e-commerce display where applicable.
+
+26(g)
+
+Certain loose commodities ordered through e-commerce channels, with specified information including:
+
+Manufacturer/marketer/brand owner/importer/seller
+Country of origin where applicable
+Consumer care
+Retail sale price
+Net quantity.
+🚨 This means your system needs an EXEMPTION ENGINE
+
+Before checking a package:
+
+                 Product
+                    ↓
+            Applicability Engine
+                    ↓
+        ┌───────────┴───────────┐
+        ↓                       ↓
+    Applicable              Exempt
+        ↓                       ↓
+ Check required          Check exemption-
+ declarations            specific information
+
+This prevents the AI from screaming "VIOLATION!" every five minutes.
+
