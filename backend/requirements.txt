@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-multipart
+sqlalchemy
+psycopg2-binary
+google-genai
+pillow
+pydantic
+python-dotenv
+opencv-python-headless
