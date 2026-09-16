@@ -16,24 +16,60 @@ export const ComplianceProvider: React.FC<{children: React.ReactNode}> = ({ chil
   const [liveViolations, setLiveViolations] = useState<ViolationEvent[]>([]);
 
   useEffect(() => {
-    // Initial heatmap mock data matching the intensity of the user's image
-    const initialHeatmap = {
-      "Uttar Pradesh": 150,
-      "Maharashtra": 120,
-      "Andhra Pradesh": 110,
-      "Madhya Pradesh": 80,
-      "NCT of Delhi": 100,
-      "Gujarat": 60,
-      "Rajasthan": 50,
-      "Bihar": 45,
-      "Karnataka": 40,
-      "Tamil Nadu": 30,
+    // Initial heatmap mock data for regions without data yet
+    const initialHeatmap: Record<string, number> = {
+      "Uttar Pradesh": 150, "Maharashtra": 120, "NCT of Delhi": 100,
     };
-    setHeatmapData(initialHeatmap);
 
-    // Populate initial static data-based violations
-    const initialViolations = Array.from({ length: 15 }).map(() => simulateViolation());
-    setLiveViolations(initialViolations);
+    const fetchLiveInspections = async () => {
+      try {
+        const response = await fetch('http://10.218.218.119:8000/api/inspections');
+        const data = await response.json();
+        
+        const violations: ViolationEvent[] = [];
+        const heatmap = { ...initialHeatmap };
+
+        data.inspections.forEach((insp: any) => {
+          // Add region to heatmap
+          let region = insp.address;
+          heatmap[region] = (heatmap[region] || 0) + 1;
+
+          // For every failed rule, create a map dot
+          insp.failed_rules.forEach((rule: string) => {
+            let lat = 20.0, lon = 78.0;
+            if (insp.locationGps) {
+              const coords = insp.locationGps.split(',');
+              if (coords.length === 2) {
+                lat = parseFloat(coords[0].trim());
+                lon = parseFloat(coords[1].trim());
+              }
+            }
+
+            // Jitter to prevent exact overlap
+            const jitterX = (Math.random() - 0.5) * 0.5;
+            const jitterY = (Math.random() - 0.5) * 0.5;
+
+            violations.push({
+              id: insp.id,
+              rule: rule,
+              regionId: region,
+              regionName: region,
+              coordinates: [lon + jitterX, lat + jitterY], // Longitude, Latitude for map
+              timestamp: new Date(insp.date)
+            });
+          });
+        });
+
+        setHeatmapData(heatmap);
+        setLiveViolations(violations);
+      } catch (e) {
+        console.error("Failed to fetch from backend", e);
+      }
+    };
+
+    fetchLiveInspections();
+    const interval = setInterval(fetchLiveInspections, 15000); // Auto-refresh every 15s
+    return () => clearInterval(interval);
   }, []);
 
   const addViolation = (newViolation: ViolationEvent) => {

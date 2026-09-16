@@ -1,7 +1,16 @@
-import { mockComplianceData } from '../data/mockData';
+import { useState, useEffect } from 'react';
 import { StatusBadge } from '../components/StatusBadge';
 
 export function Inspections() {
+  const [inspections, setInspections] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('http://10.218.218.119:8000/api/inspections')
+      .then(res => res.json())
+      .then(data => setInspections(data.inspections || []))
+      .catch(e => console.error(e));
+  }, []);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -23,27 +32,30 @@ export function Inspections() {
               <tr>
                 <th>Inspection ID</th>
                 <th>Product Name</th>
-                <th>Manufacturer</th>
+                <th>Manufacturer/Brand</th>
                 <th>Status Pipeline</th>
-                <th>AI Severity</th>
+                <th>Compliance Score</th>
                 <th>Scan Date</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {mockComplianceData.recentInspections.map((inspection) => (
+              {inspections.map((inspection) => (
                 <tr key={inspection.id}>
                   <td style={{ color: 'var(--accent-color)', fontWeight: 500 }}>{inspection.id}</td>
                   <td>{inspection.product}</td>
-                  <td>{inspection.manufacturer}</td>
-                  <td><StatusBadge status={inspection.status} /></td>
-                  <td><StatusBadge status={inspection.severity} type="severity" /></td>
+                  <td>{inspection.brand}</td>
+                  <td><StatusBadge status={inspection.is_compliant ? 'Verified' : 'Pending Review'} /></td>
+                  <td><StatusBadge status={inspection.score > 80 ? 'High' : (inspection.score > 50 ? 'Medium' : 'Critical')} type="severity" /></td>
                   <td style={{ color: 'var(--text-secondary)' }}>{inspection.date}</td>
                   <td>
                     <button style={{ color: 'var(--accent-color)', background: 'none', border: 'none', fontWeight: 500, paddingRight: '8px' }}>Review</button>
                   </td>
                 </tr>
               ))}
+              {inspections.length === 0 && (
+                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '20px' }}>Loading real-time inspections...</td></tr>
+              )}
             </tbody>
           </table>
         </div>
