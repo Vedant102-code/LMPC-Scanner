@@ -1,0 +1,38 @@
+{
+  "name": "lmpc-scanner-main",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "oxlint",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@types/leaflet": "^1.9.22",
+    "d3-geo": "^3.1.1",
+    "i18next": "^26.4.2",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^1.46.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-i18next": "^17.0.14",
+    "react-leaflet": "^5.0.0",
+    "react-router-dom": "^7.18.4",
+    "react-simple-maps": "^5.0.5",
+    "react-to-print": "^3.3.0",
+    "recharts": "^3.10.1"
+  },
+  "devDependencies": {
+    "@types/d3-geo": "^3.1.1",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@types/react-simple-maps": "^3.0.6",
+    "@vitejs/plugin-react": "^6.1.1",
+    "oxlint": "^1.81.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0"
+  }
+}
