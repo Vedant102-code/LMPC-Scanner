@@ -20,6 +20,7 @@ export default function HomeScreen({ route, navigation }: Props) {
     }
 
     const result = await ImagePicker.launchCameraAsync({
+      cameraType: ImagePicker.CameraType.back,
       allowsEditing: false,
       quality: 0.8,
     });
@@ -60,6 +61,7 @@ export default function HomeScreen({ route, navigation }: Props) {
       } as any);
     });
 
+    formData.append('inspection_id', inspectionId);
     formData.append('width', '10.0');
     formData.append('height', '15.0');
 
@@ -71,8 +73,10 @@ export default function HomeScreen({ route, navigation }: Props) {
       setLoading(false);
       setImages([]); // Clear after success
       navigation.navigate('Results', {
-        imageUri: images[0], // Pass the first image to display
-        resultData: response.data,
+        data: response.data,
+        inspectionId: inspectionId,
+        locationGps: route.params.locationGps,
+        locationAddress: route.params.locationAddress
       });
 
     } catch (error: any) {

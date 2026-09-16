@@ -7,12 +7,12 @@ import ResultsScreen from './screens/ResultsScreen';
 
 export type RootStackParamList = {
   Landing: undefined;
-  Home: {
+  Home: { inspectionId: string; locationGps?: string; locationAddress?: string };
+  Results: { 
+    data: any; 
     inspectionId: string;
-  };
-  Results: {
-    imageUri: string;
-    resultData: any;
+    locationGps?: string;
+    locationAddress?: string;
   };
 };
 

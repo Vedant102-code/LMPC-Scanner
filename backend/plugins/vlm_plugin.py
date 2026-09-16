@@ -19,7 +19,8 @@ class EntityExtraction(BaseModel):
     confidence: float = Field(description="Confidence score between 0.0 and 1.0 based on visibility and clarity.", ge=0.0, le=1.0)
 
 class ExtractedEntities(BaseModel):
-    PRODUCT_NAME: Optional[EntityExtraction] = Field(None, description="The generic or common product name, including brand name if applicable.")
+    BRAND_NAME: Optional[EntityExtraction] = Field(None, description="The brand name or trademark of the product (e.g., 'Nestle', 'Samsung').")
+    PRODUCT_NAME: Optional[EntityExtraction] = Field(None, description="The generic or common product name (e.g., 'Maggi Noodles', 'Galaxy S23'). Do not combine this with the brand name unless it is inseparable.")
     MANUFACTURER_NAME: Optional[EntityExtraction] = Field(None, description="Name of the manufacturer.")
     MANUFACTURER_ADDRESS: Optional[EntityExtraction] = Field(None, description="Address of the manufacturer.")
     PACKER_NAME: Optional[EntityExtraction] = Field(None, description="Name of the packer.")
@@ -85,9 +86,11 @@ class VLMPlugin(BasePlugin):
             "- If a field is simply not present, leave it empty (null).\n"
             "- Ensure the 'value' exactly matches the text written on the packaging.\n"
             "- Estimate a realistic confidence score (0.0 to 1.0) based on how clearly you can read the final consolidated value.\n\n"
-            "Task 3 (Date, Quantity, & Context Reasoning):\n"
-            "- Packaging often uses cross-references (e.g., 'For Mfg Date, see top'). You must read the ENTIRE package to understand context.\n"
-            "- For imported goods, the 'Month and Year of Import' satisfies the packing date requirement. If you see an Import Date, extract it into the 'PACK_DATE' field.\n"
+            "Task 3 (Cross-Referencing & Implied Values):\n"
+            "- Packages frequently use implied references to save space (e.g., 'For complaints, contact Manufacturer Address', or 'Mfg Date: See Neck').\n"
+            "- If a field explicitly references another field or location for its value, you MUST mentally resolve that reference and extract the ACTUAL value into the referenced field.\n"
+            "- For example, if it says 'For complaints, contact manufacturer address', you must copy the full manufacturer address into the CONSUMER_CARE_ADDRESS field. Do not extract the phrase 'contact manufacturer address'.\n"
+            "- For imported goods, the 'Month and Year of Import' satisfies the packing date requirement.\n"
             "- For electronics or solid items sold by count, 'Net Quantity' is often written as '1 U' (Unit), '1 N' (Number), or '1 piece'. Extract this count as the NET_QUANTITY and the 'U', 'N', or 'piece' as the QUANTITY_UNIT.\n"
             "- Do NOT blindly assign a lone date to the expiry field without reading the surrounding instructions. If it says 'Use before 36 months', extract '36 months' for BEST_BEFORE_USE_BY.\n\n"
             "Task 4 (Bounding Boxes):\n"
