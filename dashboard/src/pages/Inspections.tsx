@@ -3,6 +3,7 @@ import { StatusBadge } from '../components/StatusBadge';
 
 export function Inspections() {
   const [inspections, setInspections] = useState<any[]>([]);
+  const [selectedCase, setSelectedCase] = useState<any | null>(null);
 
   useEffect(() => {
     fetch('http://10.218.218.119:8000/api/inspections')
@@ -11,18 +12,17 @@ export function Inspections() {
       .catch(e => console.error(e));
   }, []);
 
+  const openReview = (id: string) => {
+    fetch(`http://10.218.218.119:8000/api/inspections/${id}`)
+      .then(res => res.json())
+      .then(data => setSelectedCase(data))
+      .catch(e => console.error("Failed to load details", e));
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ fontSize: '1.5rem', fontWeight: 600 }}>Inspections & Case Workflow</h1>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <input 
-            type="text" 
-            placeholder="Search inspections..." 
-            style={{ padding: '8px 12px', backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }}
-          />
-          <button className="badge badge-neutral" style={{ padding: '8px 16px', border: '1px solid var(--border-color)' }}>Filter</button>
-        </div>
       </div>
 
       <div className="card">
@@ -49,17 +49,75 @@ export function Inspections() {
                   <td><StatusBadge status={inspection.score > 80 ? 'High' : (inspection.score > 50 ? 'Medium' : 'Critical')} type="severity" /></td>
                   <td style={{ color: 'var(--text-secondary)' }}>{inspection.date}</td>
                   <td>
-                    <button style={{ color: 'var(--accent-color)', background: 'none', border: 'none', fontWeight: 500, paddingRight: '8px' }}>Review</button>
+                    <button onClick={() => openReview(inspection.id)} style={{ color: 'var(--accent-color)', background: 'none', border: 'none', fontWeight: 500, cursor: 'pointer' }}>Review</button>
                   </td>
                 </tr>
               ))}
-              {inspections.length === 0 && (
-                <tr><td colSpan={7} style={{ textAlign: 'center', padding: '20px' }}>Loading real-time inspections...</td></tr>
-              )}
             </tbody>
           </table>
         </div>
       </div>
+
+      {/* Case Review Modal for Demo */}
+      {selectedCase && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'var(--bg-primary)', padding: '24px', borderRadius: '8px', width: '80%', maxWidth: '900px', maxHeight: '90vh', overflowY: 'auto', border: '1px solid var(--border-color)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Case Detail: {selectedCase.id}</h2>
+              <button onClick={() => setSelectedCase(null)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--text-primary)' }}>&times;</button>
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              <div>
+                <h3 style={{ fontSize: '1.1rem', marginBottom: '8px', borderBottom: '1px solid var(--border-color)', paddingBottom: '4px' }}>Physical Evidence</h3>
+                {selectedCase.images && selectedCase.images.length > 0 ? (
+                  selectedCase.images.map((img: str, i: number) => (
+                     <img key={i} src={`http://10.218.218.119:8000${img}`} alt="Evidence" style={{ width: '100%', borderRadius: '4px', marginBottom: '8px' }} />
+                  ))
+                ) : (
+                  <div style={{ width: '100%', height: '200px', backgroundColor: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>No Evidence Images Uploaded</div>
+                )}
+                
+                <h3 style={{ fontSize: '1.1rem', marginTop: '16px', marginBottom: '8px', borderBottom: '1px solid var(--border-color)', paddingBottom: '4px' }}>Raw AI Extraction (JSON)</h3>
+                <pre style={{ background: '#1e1e1e', color: '#d4d4d4', padding: '12px', borderRadius: '4px', overflowX: 'auto', fontSize: '0.8rem' }}>
+                  {selectedCase.raw_json ? JSON.stringify(JSON.parse(selectedCase.raw_json), null, 2) : 'No JSON Data available'}
+                </pre>
+              </div>
+              
+              <div>
+                <h3 style={{ fontSize: '1.1rem', marginBottom: '8px', borderBottom: '1px solid var(--border-color)', paddingBottom: '4px' }}>AI Compliance Breakdown</h3>
+                <p><strong>Brand:</strong> {selectedCase.brand}</p>
+                <p><strong>Product:</strong> {selectedCase.product}</p>
+                <p><strong>Location:</strong> {selectedCase.address}</p>
+                <p><strong>Score:</strong> {selectedCase.score}%</p>
+                
+                <table style={{ width: '100%', marginTop: '16px', borderCollapse: 'collapse' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
+                      <th style={{ padding: '8px' }}>Rule</th>
+                      <th style={{ padding: '8px' }}>Status</th>
+                      <th style={{ padding: '8px' }}>AI Confidence</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedCase.checks && selectedCase.checks.map((check: any, idx: number) => (
+                      <tr key={idx} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                        <td style={{ padding: '8px', fontSize: '0.9rem' }}>{check.rule}</td>
+                        <td style={{ padding: '8px' }}>
+                          <span style={{ color: check.status === 'PASS' ? '#10b981' : '#ef4444', fontWeight: 'bold' }}>{check.status}</span>
+                        </td>
+                        <td style={{ padding: '8px' }}>
+                          {check.confidence ? `${(check.confidence * 100).toFixed(1)}%` : 'N/A'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
