@@ -1,9 +1,34 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { StatusBadge } from '../components/StatusBadge';
+import { useReactToPrint } from 'react-to-print';
+import { InspectionReportTemplate } from '../components/InspectionReportTemplate';
 
 export function Inspections() {
   const [inspections, setInspections] = useState<any[]>([]);
   const [selectedCase, setSelectedCase] = useState<any | null>(null);
+  
+  const reportRef = useRef<HTMLDivElement>(null);
+  
+  const handlePrintPDF = useReactToPrint({
+    contentRef: reportRef,
+    documentTitle: `LMPC_Inspection_${selectedCase?.id || 'Report'}`,
+  });
+
+  const handleExportWord = () => {
+    if (!reportRef.current) return;
+    
+    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>LMPC Inspection Report</title></head><body>";
+    const footer = "</body></html>";
+    const sourceHTML = header + reportRef.current.innerHTML + footer;
+    
+    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+    const fileDownload = document.createElement("a");
+    document.body.appendChild(fileDownload);
+    fileDownload.href = source;
+    fileDownload.download = `LMPC_Inspection_${selectedCase?.id || 'Report'}.doc`;
+    fileDownload.click();
+    document.body.removeChild(fileDownload);
+  };
 
   useEffect(() => {
     fetch('http://10.218.218.119:8000/api/inspections')
@@ -58,13 +83,26 @@ export function Inspections() {
         </div>
       </div>
 
-      {/* Case Review Modal for Demo */}
+      {/* Hidden Report Template for Printing/Exporting */}
+      <div style={{ display: 'none' }}>
+        <InspectionReportTemplate ref={reportRef} caseData={selectedCase} />
+      </div>
+
+      {/* Case Review Modal */}
       {selectedCase && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
           <div style={{ background: 'var(--bg-primary)', padding: '24px', borderRadius: '8px', width: '80%', maxWidth: '900px', maxHeight: '90vh', overflowY: 'auto', border: '1px solid var(--border-color)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', alignItems: 'center' }}>
               <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Case Detail: {selectedCase.id}</h2>
-              <button onClick={() => setSelectedCase(null)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--text-primary)' }}>&times;</button>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <button onClick={handleExportWord} style={{ backgroundColor: '#2563eb', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>
+                  Export as Word (.doc)
+                </button>
+                <button onClick={() => handlePrintPDF()} style={{ backgroundColor: '#10b981', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer' }}>
+                  Generate Locked PDF
+                </button>
+                <button onClick={() => setSelectedCase(null)} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: 'var(--text-primary)', marginLeft: '10px' }}>&times;</button>
+              </div>
             </div>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
