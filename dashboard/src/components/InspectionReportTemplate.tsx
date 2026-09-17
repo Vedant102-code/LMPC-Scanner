@@ -116,12 +116,16 @@ export const InspectionReportTemplate = forwardRef<HTMLDivElement, ReportProps>(
         {caseData.images && caseData.images.length > 0 ? (
           caseData.images.map((img: string, i: number) => (
              <div key={i} style={{ border: '1px solid #ccc', padding: '10px', textAlign: 'center' }}>
-               <img 
-                 src={`https://lmpc-scanner.onrender.com${img}`} 
-                 alt="Evidence" 
-                 onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1605600659908-0ef719419d41?auto=format&fit=crop&w=400&q=80'; }}
-                 style={{ width: '100%', maxHeight: '400px', objectFit: 'contain' }} 
-               />
+                 <img 
+                   src={`https://lmpc-scanner.onrender.com${img}`} 
+                   alt="Evidence" 
+                   onError={(e) => { 
+                     const target = e.currentTarget as HTMLImageElement;
+                     target.onerror = null; 
+                     target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNlMGUwZTAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM4ODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBVbmF2YWlsYWJsZTwvdGV4dD48L3N2Zz4='; 
+                   }}
+                   style={{ width: '100%', maxHeight: '400px', objectFit: 'contain' }} 
+                 />
                <p style={{ marginTop: '10px', fontSize: '12px', fontWeight: 'bold' }}>Exhibit {i + 1}</p>
              </div>
           ))
