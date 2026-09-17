@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, FileText, Settings, ShieldAlert, Users } from 'lucide-react';
+import { LayoutDashboard, FileText, Users, ShieldAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export function Sidebar() {
