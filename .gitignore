@@ -1,0 +1,30 @@
+# Node/React Native/Expo
+mobile_app/node_modules/
+mobile_app/.expo/
+mobile_app/dist/
+mobile_app/npm-debug.log
+mobile_app/yarn-error.log
+
+# Python/FastAPI
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+backend/.pytest_cache/
+
+# Databases & Uploads (DO NOT COMMIT SENSITIVE DATA)
+backend/lmpc.db
+backend/uploads/
+*.db
+*.sqlite3
+
+# Environment Variables
+.env
+backend/.env
+mobile_app/.env
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# AI Models
+backend/models/
