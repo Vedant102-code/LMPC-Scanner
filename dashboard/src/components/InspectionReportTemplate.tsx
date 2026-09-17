@@ -116,7 +116,12 @@ export const InspectionReportTemplate = forwardRef<HTMLDivElement, ReportProps>(
         {caseData.images && caseData.images.length > 0 ? (
           caseData.images.map((img: string, i: number) => (
              <div key={i} style={{ border: '1px solid #ccc', padding: '10px', textAlign: 'center' }}>
-               <img src={`http://10.218.218.119:8000${img}`} alt="Evidence" style={{ width: '100%', maxHeight: '400px', objectFit: 'contain' }} />
+               <img 
+                 src={`https://lmpc-scanner.onrender.com${img}`} 
+                 alt="Evidence" 
+                 onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1605600659908-0ef719419d41?auto=format&fit=crop&w=400&q=80'; }}
+                 style={{ width: '100%', maxHeight: '400px', objectFit: 'contain' }} 
+               />
                <p style={{ marginTop: '10px', fontSize: '12px', fontWeight: 'bold' }}>Exhibit {i + 1}</p>
              </div>
           ))

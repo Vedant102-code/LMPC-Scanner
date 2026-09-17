@@ -31,14 +31,14 @@ export function Inspections() {
   };
 
   useEffect(() => {
-    fetch('http://10.218.218.119:8000/api/inspections')
+    fetch('https://lmpc-scanner.onrender.com/api/inspections')
       .then(res => res.json())
       .then(data => setInspections(data.inspections || []))
       .catch(e => console.error(e));
   }, []);
 
   const openReview = (id: string) => {
-    fetch(`http://10.218.218.119:8000/api/inspections/${id}`)
+    fetch(`https://lmpc-scanner.onrender.com/api/inspections/${id}`)
       .then(res => res.json())
       .then(data => setSelectedCase(data))
       .catch(e => console.error("Failed to load details", e));
@@ -109,8 +109,14 @@ export function Inspections() {
               <div>
                 <h3 style={{ fontSize: '1.1rem', marginBottom: '8px', borderBottom: '1px solid var(--border-color)', paddingBottom: '4px' }}>Physical Evidence</h3>
                 {selectedCase.images && selectedCase.images.length > 0 ? (
-                  selectedCase.images.map((img: str, i: number) => (
-                     <img key={i} src={`http://10.218.218.119:8000${img}`} alt="Evidence" style={{ width: '100%', borderRadius: '4px', marginBottom: '8px' }} />
+                  selectedCase.images.map((img: string, i: number) => (
+                     <img 
+                       key={i} 
+                       src={`https://lmpc-scanner.onrender.com${img}`} 
+                       alt="Evidence" 
+                       onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1605600659908-0ef719419d41?auto=format&fit=crop&w=400&q=80'; }}
+                       style={{ width: '100%', borderRadius: '4px', marginBottom: '8px', objectFit: 'cover' }} 
+                     />
                   ))
                 ) : (
                   <div style={{ width: '100%', height: '200px', backgroundColor: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>No Evidence Images Uploaded</div>

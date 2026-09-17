@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { simulateViolation } from '../services/violationSimulator';
 import type { ViolationEvent } from '../services/violationSimulator';
 
 interface ComplianceState {
@@ -23,7 +22,7 @@ export const ComplianceProvider: React.FC<{children: React.ReactNode}> = ({ chil
 
     const fetchLiveInspections = async () => {
       try {
-        const response = await fetch('http://10.218.218.119:8000/api/inspections');
+        const response = await fetch('https://lmpc-scanner.onrender.com/api/inspections');
         const data = await response.json();
         
         const violations: ViolationEvent[] = [];
