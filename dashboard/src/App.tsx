@@ -8,14 +8,12 @@ import { ComplianceProvider } from './context/ComplianceContext';
 function App() {
   return (
     <ComplianceProvider>
-      <BrowserRouter>
+      <BrowserRouter basename="/LMPC-Scanner">
         <Routes>
         <Route path="/" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="inspections" element={<Inspections />} />
-          <Route path="violations" element={<div style={{padding:'20px'}}>Violations Page (Coming Soon)</div>} />
           <Route path="officers" element={<Officers />} />
-          <Route path="settings" element={<div style={{padding:'20px'}}>Settings Page (Coming Soon)</div>} />
         </Route>
       </Routes>
       </BrowserRouter>

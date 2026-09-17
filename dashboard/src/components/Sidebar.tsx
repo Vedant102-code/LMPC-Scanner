@@ -8,9 +8,7 @@ export function Sidebar() {
   const navItems = [
     { name: t('sidebar.dashboard'), path: '/', icon: <LayoutDashboard size={20} /> },
     { name: t('sidebar.inspections'), path: '/inspections', icon: <FileText size={20} /> },
-    { name: t('sidebar.violations'), path: '/violations', icon: <ShieldAlert size={20} /> },
     { name: t('sidebar.officers'), path: '/officers', icon: <Users size={20} /> },
-    { name: t('sidebar.settings'), path: '/settings', icon: <Settings size={20} /> },
   ];
 
   return (
