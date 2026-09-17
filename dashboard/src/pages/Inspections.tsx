@@ -109,19 +109,10 @@ export function Inspections() {
               <div>
                 <h3 style={{ fontSize: '1.1rem', marginBottom: '8px', borderBottom: '1px solid var(--border-color)', paddingBottom: '4px' }}>Physical Evidence</h3>
                 {selectedCase.images && selectedCase.images.length > 0 ? (
-                  selectedCase.images.map((img: string, i: number) => (
-                     <img 
-                       key={i} 
-                       src={`https://lmpc-scanner.onrender.com${img}`} 
-                       alt="Evidence" 
-                       onError={(e) => { 
-                         const target = e.currentTarget as HTMLImageElement;
-                         target.onerror = null; 
-                         target.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgNDAwIDMwMCI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNlMGUwZTAiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM4ODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZSBVbmF2YWlsYWJsZTwvdGV4dD48L3N2Zz4='; 
-                       }}
-                       style={{ width: '100%', borderRadius: '4px', marginBottom: '8px', objectFit: 'cover' }} 
-                     />
-                  ))
+                  selectedCase.images.map((img: string, i: number) => {
+                     const imgSrc = img.startsWith('http') ? img : `https://lmpc-scanner.onrender.com${img}`;
+                     return <img key={i} src={imgSrc} alt="Evidence" style={{ width: '100%', borderRadius: '4px', marginBottom: '8px' }} />
+                  })
                 ) : (
                   <div style={{ width: '100%', height: '200px', backgroundColor: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>No Evidence Images Uploaded</div>
                 )}
